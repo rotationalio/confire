@@ -18,16 +18,16 @@ package main
 import (
 	"fmt"
 	"log"
-    "time"
+	"time"
 
 	"github.com/rotationalio/confire"
 )
 
 type Config struct {
-	Debug    bool
-	Port     int
-    Timeout  time.Duration
-    Rate     float64
+	Debug   bool
+	Port    int
+	Timeout time.Duration
+	Rate    float64
 }
 
 func main() {
