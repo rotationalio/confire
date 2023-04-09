@@ -42,4 +42,11 @@ func main() {
 
 ## Credits
 
-Special thanks to [github.com/koding/mulitconfig](https://github.com/koding/multiconfig) and [github.com/kelseyhightower/envconfig](https://github.com/kelseyhightower/envconfig) for serving as inspiration for this package.
+Special thanks to the following libraries for providing inspiration and code snippets using their open sources licenses:
+
+- [github.com/koding/mulitconfig](https://github.com/koding/multiconfig)
+- [github.com/kelseyhightower/envconfig](https://github.com/kelseyhightower/envconfig)
+- [github.com/aglyzov/go-patch](https://github.com/aglyzov/go-patch)
+- [github.com/fatih/structs](https://github.com/fatih/structs/)
+
+This package makes detailed use of the `reflect` package in Go and a lot of reference code was necessary to make this happen easily!
