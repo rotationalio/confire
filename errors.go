@@ -29,3 +29,20 @@ func (e *ParseError) Is(target error) bool {
 func (e *ParseError) Unwrap() error {
 	return e.Err
 }
+
+type ValidationError struct {
+	Source string
+	Err    error
+}
+
+func (e *ValidationError) Error() string {
+	return fmt.Sprintf("invalid configuration: %s", e.Err)
+}
+
+func (e *ValidationError) Is(target error) bool {
+	return errors.Is(e.Err, target)
+}
+
+func (e *ValidationError) Unwrap() error {
+	return e.Err
+}
