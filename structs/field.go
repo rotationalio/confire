@@ -108,3 +108,8 @@ func (f *Field) Zero() error {
 	zero := reflect.Zero(f.value.Type()).Interface()
 	return f.Set(zero)
 }
+
+// Fields returns a slice of Fields, usually used to get the fields from a nested struct.
+func (f *Field) Fields() []*Field {
+	return getFields(f.value)
+}
