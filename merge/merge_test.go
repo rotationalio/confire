@@ -1,4 +1,4 @@
-package patch_test
+package merge_test
 
 import (
 	"errors"
@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rotationalio/confire/patch"
+	"github.com/rotationalio/confire/merge"
 	"github.com/rotationalio/confire/structs"
 )
 
-func TestPatch(t *testing.T) {
+func TestMerge(t *testing.T) {
 	src := &Color{
 		Red:  0x7b,
 		Blue: 0x5b,
@@ -22,7 +22,7 @@ func TestPatch(t *testing.T) {
 		Blue:  0xdc,
 	}
 
-	changed, err := patch.Patch(dst, src)
+	changed, err := merge.Merge(dst, src)
 	ok(t, err)
 	assert(t, changed, "expected the destination to be changed")
 	equals(t, uint8(0x7b), dst.Red)
@@ -30,7 +30,7 @@ func TestPatch(t *testing.T) {
 	equals(t, uint8(0x5b), dst.Blue)
 }
 
-func TestPatchEmbedded(t *testing.T) {
+func TestMergeEmbedded(t *testing.T) {
 	src := &Crayon{
 		Name: "Thistle",
 		Color: Color{
@@ -42,7 +42,7 @@ func TestPatchEmbedded(t *testing.T) {
 
 	dst := &Crayon{}
 
-	changed, err := patch.Patch(dst, src)
+	changed, err := merge.Merge(dst, src)
 	ok(t, err)
 	assert(t, changed, "expected the destination to be changed")
 	equals(t, "Thistle", dst.Name)
@@ -51,7 +51,7 @@ func TestPatchEmbedded(t *testing.T) {
 	equals(t, uint8(0xd8), dst.Blue)
 }
 
-func TestPatchNested(t *testing.T) {
+func TestMergeNested(t *testing.T) {
 	t.Skip("nested patching isn't quite working yet")
 	src := &CrayonBox{
 		Title:   "box alpha",
@@ -79,7 +79,7 @@ func TestPatchNested(t *testing.T) {
 		unexported: "bravo",
 	}
 
-	changed, err := patch.Patch(dst, src)
+	changed, err := merge.Merge(dst, src)
 	ok(t, err)
 	assert(t, changed, "expected the destination to be changed")
 	equals(t, "bravo", dst.unexported)
@@ -95,7 +95,7 @@ func TestIgnoreEmptyPatch(t *testing.T) {
 		},
 	}
 
-	changed, err := patch.Patch(&c, struct{}{})
+	changed, err := merge.Merge(&c, struct{}{})
 	ok(t, err)
 	assert(t, !changed, "the crayon should not have been changed")
 	equals(t, "Asparagus", c.Name)
@@ -103,16 +103,16 @@ func TestIgnoreEmptyPatch(t *testing.T) {
 	equals(t, uint8(0xa0), c.Green)
 	equals(t, uint8(0x5b), c.Blue)
 
-	changed, err = patch.Patch(c, struct{}{})
+	changed, err = merge.Merge(c, struct{}{})
 	ok(t, err)
 	assert(t, !changed, "the crayon should not have been changed")
 }
 
 func TestOnlyStructs(t *testing.T) {
-	_, err := patch.Patch(42, Crayon{})
+	_, err := merge.Merge(42, Crayon{})
 	assert(t, errors.Is(err, structs.ErrNotAStruct), "expected error when dst is not a struct")
 
-	_, err = patch.Patch(Crayon{}, 41)
+	_, err = merge.Merge(Crayon{}, 41)
 	assert(t, errors.Is(err, structs.ErrNotAStruct), "expected error when src is not a struct")
 }
 
