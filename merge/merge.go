@@ -1,3 +1,10 @@
+/*
+Package merge provides functionality to merge a struct in place with non-zero values
+from a source struct. Only fields with the same name and type get updated.
+
+Experimental: note that the functionality in this package is experimental and subject
+to change. Merging with embedded and nested structs is not fully tested.
+*/
 package merge
 
 import (
@@ -15,6 +22,8 @@ import (
 // nil is the non-zero value or use patch.
 //
 // Returns true if any value has been changed on the destination struct.
+//
+// Experimental: merging is experimental and subject to change.
 func Merge(dst, src interface{}) (changed bool, err error) {
 	// Find all of the correlated fields between src and dst, ensuring that embedded
 	// structs are correctly added and that nested structs are recursively merged.
@@ -82,7 +91,7 @@ func getMergePairs(dst, src interface{}) (mergePairs []*fieldPair, err error) {
 			continue
 		}
 
-		// Add embedded fields to the pairs
+		// Add Embedded fields to the pairs
 		if srcf.IsEmbedded() {
 			var embeddedPairs []*fieldPair
 			if embeddedPairs, err = getMergePairs(dstf.Value(), srcf.Value()); err != nil {
