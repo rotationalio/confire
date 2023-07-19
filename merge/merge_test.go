@@ -1,13 +1,12 @@
 package merge_test
 
 import (
-	"errors"
-	"reflect"
 	"testing"
 	"time"
 
+	"github.com/rotationalio/confire/assert"
+	"github.com/rotationalio/confire/errors"
 	"github.com/rotationalio/confire/merge"
-	"github.com/rotationalio/confire/structs"
 )
 
 func TestMerge(t *testing.T) {
@@ -23,11 +22,11 @@ func TestMerge(t *testing.T) {
 	}
 
 	changed, err := merge.Merge(dst, src)
-	ok(t, err)
-	assert(t, changed, "expected the destination to be changed")
-	equals(t, uint8(0x7b), dst.Red)
-	equals(t, uint8(0xa0), dst.Green)
-	equals(t, uint8(0x5b), dst.Blue)
+	assert.Ok(t, err)
+	assert.Assert(t, changed, "expected the destination to be changed")
+	assert.Equals(t, uint8(0x7b), dst.Red)
+	assert.Equals(t, uint8(0xa0), dst.Green)
+	assert.Equals(t, uint8(0x5b), dst.Blue)
 }
 
 func TestMergeEmbedded(t *testing.T) {
@@ -44,12 +43,12 @@ func TestMergeEmbedded(t *testing.T) {
 	dst := &Crayon{}
 
 	changed, err := merge.Merge(dst, src)
-	ok(t, err)
-	assert(t, changed, "expected the destination to be changed")
-	equals(t, "Thistle", dst.Name)
-	equals(t, uint8(0xd8), dst.Red)
-	equals(t, uint8(0xbf), dst.Green)
-	equals(t, uint8(0xd8), dst.Blue)
+	assert.Ok(t, err)
+	assert.Assert(t, changed, "expected the destination to be changed")
+	assert.Equals(t, "Thistle", dst.Name)
+	assert.Equals(t, uint8(0xd8), dst.Red)
+	assert.Equals(t, uint8(0xbf), dst.Green)
+	assert.Equals(t, uint8(0xd8), dst.Blue)
 }
 
 func TestMergeNested(t *testing.T) {
@@ -81,9 +80,9 @@ func TestMergeNested(t *testing.T) {
 	}
 
 	changed, err := merge.Merge(dst, src)
-	ok(t, err)
-	assert(t, changed, "expected the destination to be changed")
-	equals(t, "bravo", dst.unexported)
+	assert.Ok(t, err)
+	assert.Assert(t, changed, "expected the destination to be changed")
+	assert.Equals(t, "bravo", dst.unexported)
 }
 
 func TestIgnoreEmptyPatch(t *testing.T) {
@@ -97,24 +96,24 @@ func TestIgnoreEmptyPatch(t *testing.T) {
 	}
 
 	changed, err := merge.Merge(&c, struct{}{})
-	ok(t, err)
-	assert(t, !changed, "the crayon should not have been changed")
-	equals(t, "Asparagus", c.Name)
-	equals(t, uint8(0x7b), c.Red)
-	equals(t, uint8(0xa0), c.Green)
-	equals(t, uint8(0x5b), c.Blue)
+	assert.Ok(t, err)
+	assert.Assert(t, !changed, "the crayon should not have been changed")
+	assert.Equals(t, "Asparagus", c.Name)
+	assert.Equals(t, uint8(0x7b), c.Red)
+	assert.Equals(t, uint8(0xa0), c.Green)
+	assert.Equals(t, uint8(0x5b), c.Blue)
 
 	changed, err = merge.Merge(c, struct{}{})
-	ok(t, err)
-	assert(t, !changed, "the crayon should not have been changed")
+	assert.Ok(t, err)
+	assert.Assert(t, !changed, "the crayon should not have been changed")
 }
 
 func TestOnlyStructs(t *testing.T) {
 	_, err := merge.Merge(42, Crayon{})
-	assert(t, errors.Is(err, structs.ErrNotAStruct), "expected error when dst is not a struct")
+	assert.ErrorIs(t, err, errors.ErrNotAStruct)
 
 	_, err = merge.Merge(Crayon{}, 41)
-	assert(t, errors.Is(err, structs.ErrNotAStruct), "expected error when src is not a struct")
+	assert.ErrorIs(t, err, errors.ErrNotAStruct)
 }
 
 /*
@@ -138,40 +137,4 @@ type CrayonBox struct {
 	Crayons    []*Crayon
 	Highlight  *Crayon
 	unexported string
-}
-
-/*
-Assertion Helpers
-
-Because this is a library, we prefer to have no dependencies including our usual test
-dependencies (e.g. testify require). So we have some basic assertion helpers for tests.
-
-See: https://github.com/benbjohnson/testing
-*/
-
-// assert fails the test if the condition is false.
-func assert(tb testing.TB, condition bool, msg string, v ...interface{}) {
-	tb.Helper()
-	if !condition {
-		tb.Logf("\n"+msg+"\n", v...)
-		tb.FailNow()
-	}
-}
-
-// ok fails the test if an err is not nil.
-func ok(tb testing.TB, err error) {
-	tb.Helper()
-	if err != nil {
-		tb.Logf("\nunexpected error: %q\n", err.Error())
-		tb.FailNow()
-	}
-}
-
-// equals fails the test if exp is not equal to act.
-func equals(tb testing.TB, exp, act interface{}) {
-	tb.Helper()
-	if !reflect.DeepEqual(exp, act) {
-		tb.Logf("\nactual value did not match expected:\n\n\t- exp: %#v\n\t- got: %#v\n", exp, act)
-		tb.FailNow()
-	}
 }

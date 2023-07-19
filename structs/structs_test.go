@@ -1,11 +1,11 @@
 package structs_test
 
 import (
-	"errors"
-	"reflect"
 	"testing"
 	"time"
 
+	"github.com/rotationalio/confire/assert"
+	"github.com/rotationalio/confire/errors"
 	"github.com/rotationalio/confire/structs"
 )
 
@@ -13,13 +13,13 @@ func TestNewIsPointer(t *testing.T) {
 	// Test struct initialization and IsPointer method
 	spec := &Specification{}
 	s, err := structs.New(spec)
-	ok(t, err)
-	assert(t, s.IsPointer(), "expected specification to be a pointer")
+	assert.Ok(t, err)
+	assert.Assert(t, s.IsPointer(), "expected specification to be a pointer")
 
 	val := Specification{}
 	s, err = structs.New(val)
-	ok(t, err)
-	assert(t, !s.IsPointer(), "expected specification value to not be a pointer")
+	assert.Ok(t, err)
+	assert.Assert(t, !s.IsPointer(), "expected specification value to not be a pointer")
 }
 
 func TestNewError(t *testing.T) {
@@ -41,7 +41,7 @@ func TestNewError(t *testing.T) {
 
 	for _, tc := range testCases {
 		_, err := structs.New(tc)
-		errorIs(t, err, structs.ErrNotAStruct)
+		assert.ErrorIs(t, err, errors.ErrNotAStruct)
 	}
 }
 
@@ -58,56 +58,56 @@ func TestName(t *testing.T) {
 
 	for _, tc := range testCases {
 		s, err := structs.New(tc.spec)
-		ok(t, err)
-		equals(t, tc.name, s.Name())
+		assert.Ok(t, err)
+		assert.Equals(t, tc.name, s.Name())
 	}
 }
 
 func TestNames(t *testing.T) {
 	s, err := structs.New(&Specification{})
-	ok(t, err)
+	assert.Ok(t, err)
 
 	fields := s.Names()
 	expected := []string{"Debug", "Name", "Port", "Rate", "Users", "Authn", "Timeout", "Started", "Colors", "OptionalColors", "Nested", "OptionalNested", "Level", "unexported"}
-	equals(t, 14, len(fields))
-	equals(t, expected, fields)
+	assert.Equals(t, 14, len(fields))
+	assert.Equals(t, expected, fields)
 }
 
 func TestFields(t *testing.T) {
 	s, err := structs.New(&Specification{})
-	ok(t, err)
+	assert.Ok(t, err)
 
 	fields := s.Fields()
-	equals(t, 14, len(fields))
+	assert.Equals(t, 14, len(fields))
 }
 
 func TestField(t *testing.T) {
 	s, err := structs.New(&Specification{})
-	ok(t, err)
+	assert.Ok(t, err)
 
 	// Test a field that does exist
 	_, err = s.Field("Debug")
-	ok(t, err)
+	assert.Ok(t, err)
 
 	// Test a field that does not exist
 	_, err = s.Field("Foo")
-	assert(t, err.Error() == "no field named \"Foo\" on Specification", "expected field Foo to return an error")
+	assert.Assert(t, err.Error() == "no field named \"Foo\" on Specification", "expected field Foo to return an error")
 }
 
 func TestIsZero(t *testing.T) {
 	spec := &Specification{}
 	s, err := structs.New(spec)
-	ok(t, err)
-	assert(t, s.IsZero(), "expected specification pointer to be zero-valued")
+	assert.Ok(t, err)
+	assert.Assert(t, s.IsZero(), "expected specification pointer to be zero-valued")
 
 	val := Specification{}
 	s, err = structs.New(val)
-	ok(t, err)
-	assert(t, s.IsZero(), "expected specification value to be zero-valued")
+	assert.Ok(t, err)
+	assert.Assert(t, s.IsZero(), "expected specification value to be zero-valued")
 
 	// unexported fields should not be evaluated for zero-valuedness
 	spec.unexported = "foo"
-	assert(t, s.IsZero(), "expected specification with non-zero unexported field to be zero-valued")
+	assert.Assert(t, s.IsZero(), "expected specification with non-zero unexported field to be zero-valued")
 }
 
 func TestNotIsZero(t *testing.T) {
@@ -131,24 +131,24 @@ func TestNotIsZero(t *testing.T) {
 		tc(spec)
 
 		s, err := structs.New(spec)
-		ok(t, err)
-		assert(t, !s.IsZero(), "test case %d failed: expected struct to not be zero-valued", i)
+		assert.Ok(t, err)
+		assert.Assert(t, !s.IsZero(), "test case %d failed: expected struct to not be zero-valued", i)
 	}
 }
 
 func TestNotHasZero(t *testing.T) {
 	spec := NewCompleteSpec()
 	s, err := structs.New(spec)
-	ok(t, err)
-	assert(t, !s.HasZero(), "expected specification pointer to not have any zero-valued fields")
+	assert.Ok(t, err)
+	assert.Assert(t, !s.HasZero(), "expected specification pointer to not have any zero-valued fields")
 
 	s, err = structs.New(*spec)
-	ok(t, err)
-	assert(t, !s.HasZero(), "expected specification value to not have any zero-valued fields")
+	assert.Ok(t, err)
+	assert.Assert(t, !s.HasZero(), "expected specification value to not have any zero-valued fields")
 
 	// unexported fields should not be evaluated for zero-valuedness
 	spec.unexported = ""
-	assert(t, !s.HasZero(), "expected specification with non-zero unexported field to not have any zero-valued fields")
+	assert.Assert(t, !s.HasZero(), "expected specification with non-zero unexported field to not have any zero-valued fields")
 }
 
 func TestHasZero(t *testing.T) {
@@ -172,8 +172,8 @@ func TestHasZero(t *testing.T) {
 		tc(spec)
 
 		s, err := structs.New(spec)
-		ok(t, err)
-		assert(t, s.HasZero(), "test case %d failed: expected struct to have one zero-valued field", i)
+		assert.Ok(t, err)
+		assert.Assert(t, s.HasZero(), "test case %d failed: expected struct to have one zero-valued field", i)
 	}
 }
 
@@ -324,45 +324,3 @@ func (s *Specification) Clone() *Specification {
 }
 
 type SpecMod func(s *Specification)
-
-/*
-Assertion Helpers
-
-Because this is a library, we prefer to have no dependencies including our usual test
-dependencies (e.g. testify require). So we have some basic assertion helpers for tests.
-
-See: https://github.com/benbjohnson/testing
-*/
-
-// assert fails the test if the condition is false.
-func assert(tb testing.TB, condition bool, msg string, v ...interface{}) {
-	tb.Helper()
-	if !condition {
-		tb.Logf("\n"+msg+"\n", v...)
-		tb.FailNow()
-	}
-}
-
-// ok fails the test if an err is not nil.
-func ok(tb testing.TB, err error) {
-	tb.Helper()
-	if err != nil {
-		tb.Logf("\nunexpected error: %q\n", err.Error())
-		tb.FailNow()
-	}
-}
-
-// errorIs fails the test if the err does not match the target.
-func errorIs(tb testing.TB, err, target error) {
-	tb.Helper()
-	assert(tb, errors.Is(err, target), "expected target to be in error chain")
-}
-
-// equals fails the test if exp is not equal to act.
-func equals(tb testing.TB, exp, act interface{}) {
-	tb.Helper()
-	if !reflect.DeepEqual(exp, act) {
-		tb.Logf("\nactual value did not match expected:\n\n\t- exp: %#v\n\t- got: %#v\n", exp, act)
-		tb.FailNow()
-	}
-}

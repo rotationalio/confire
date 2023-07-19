@@ -6,12 +6,11 @@ package, so it makes sense to have helpers for reflection to simplify things.
 package structs
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
-)
 
-var ErrNotAStruct = errors.New("cannot wrap a non-struct type")
+	"github.com/rotationalio/confire/errors"
+)
 
 // Struct encapsulates a struct type to provide reflection around the struct.
 type Struct struct {
@@ -28,7 +27,7 @@ func New(spec interface{}) (*Struct, error) {
 	}
 
 	if val.Kind() != reflect.Struct {
-		return nil, ErrNotAStruct
+		return nil, errors.ErrNotAStruct
 	}
 
 	return &Struct{
@@ -58,6 +57,10 @@ func (s *Struct) Names() []string {
 	}
 
 	return names
+}
+
+func (s *Struct) NumField() int {
+	return s.value.Type().NumField()
 }
 
 // Fields returns a slice of all the fields on the struct.
