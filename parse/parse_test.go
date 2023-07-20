@@ -38,6 +38,7 @@ func TestParseField(t *testing.T) {
 	port := 8888
 	rate := float64(0.25)
 	names := []string{"lad", "mack", "em", "bri"}
+	r8l, _ := url.Parse("https://rotational.io")
 
 	testCases := map[string]struct {
 		value    string
@@ -63,6 +64,8 @@ func TestParseField(t *testing.T) {
 		"Ages":       {"lad:4,mack:16,em:8,bri:14", map[string]int{"lad": 4, "mack": 16, "em": 8, "bri": 14}},
 		"ColorNames": {"crimson:#dc143c,peach:#ffdab9,cadet:#5f9ea0", map[string]Color{"cadet": {0x5f, 0x9e, 0xa0}, "crimson": {0xdc, 0x14, 0x3c}, "peach": {0xff, 0xda, 0xb9}}},
 		"Multi":      {"https://rotational.io,https://ensign.world", []Escape{"https%3A%2F%2Frotational.io", "https%3A%2F%2Fensign.world"}},
+		"Link":       {"https://rotational.io", CustomURL{Value: r8l}},
+		"LinkTo":     {"https://rotational.io", &CustomURL{Value: r8l}},
 		"EmptyMap":   {"", map[string]int{}},
 		"EmptySlice": {"", []string{}},
 	}
@@ -96,6 +99,8 @@ type Specification struct {
 	Ages       map[string]int
 	ColorNames map[string]Color
 	Multi      []Escape
+	Link       CustomURL
+	// LinkTo     *CustomURL
 	EmptyMap   map[string]int
 	EmptySlice []string
 }
@@ -159,4 +164,13 @@ type Escape string
 func (e *Escape) Set(value string) error {
 	*e = Escape(url.QueryEscape(value))
 	return nil
+}
+
+type CustomURL struct {
+	Value *url.URL
+}
+
+func (e *CustomURL) Decode(value string) (err error) {
+	e.Value, err = url.Parse(value)
+	return err
 }

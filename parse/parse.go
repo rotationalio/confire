@@ -11,52 +11,136 @@ import (
 	"strings"
 	"time"
 
+	"github.com/rotationalio/confire/errors"
 	"github.com/rotationalio/confire/structs"
 )
 
 func Parse(value string, field reflect.Value) error {
 	// Attempt to use the decoder, setter, and unmarshalers to parse the field.
 	if decoder := DecoderFromValue(field); decoder != nil {
-		return decoder.Decode(value)
+		if err := decoder.Decode(value); err != nil {
+			return &errors.ParseError{
+				Source: "Decoder",
+				Type:   field.Type().Name(),
+				Value:  value,
+				Err:    err,
+			}
+		}
+		return nil
 	}
 
 	if setter := SetterFromValue(field); setter != nil {
-		return setter.Set(value)
+		if err := setter.Set(value); err != nil {
+			return &errors.ParseError{
+				Source: "Setter",
+				Type:   field.Type().Name(),
+				Value:  value,
+				Err:    err,
+			}
+		}
+		return nil
 	}
 
 	if txt := TextUnmarshalerFromValue(field); txt != nil {
-		return txt.UnmarshalText([]byte(value))
+		if err := txt.UnmarshalText([]byte(value)); err != nil {
+			return &errors.ParseError{
+				Source: "TextUnmarshaler",
+				Type:   field.Type().Name(),
+				Value:  value,
+				Err:    err,
+			}
+		}
+		return nil
 	}
 
 	if bin := BinaryUnmarshalerFromValue(field); bin != nil {
 		// TODO: should we decode base64 or hex data here?
-		return bin.UnmarshalBinary([]byte(value))
+		if err := bin.UnmarshalBinary([]byte(value)); err != nil {
+			return &errors.ParseError{
+				Source: "BinaryUnmarshaler",
+				Type:   field.Type().Name(),
+				Value:  value,
+				Err:    err,
+			}
+		}
+		return nil
 	}
 
-	return parse(value, field)
+	if err := parse(value, field); err != nil {
+		return &errors.ParseError{
+			Type:  field.Type().Name(),
+			Value: value,
+			Err:   err,
+		}
+	}
+	return nil
 }
 
 // ParseField parses the given type from the field and sets it.
 func ParseField(value string, field *structs.Field) error {
 	// Attempt to use the decoder, setter, and unmarshalers to parse the field.
 	if decoder := DecoderFrom(field); decoder != nil {
-		return decoder.Decode(value)
+		if err := decoder.Decode(value); err != nil {
+			return &errors.ParseError{
+				Source: "Decoder",
+				Field:  field.Name(),
+				Type:   field.Type().Name(),
+				Value:  value,
+				Err:    err,
+			}
+		}
+		return nil
 	}
 
 	if setter := SetterFrom(field); setter != nil {
-		return setter.Set(value)
+		if err := setter.Set(value); err != nil {
+			return &errors.ParseError{
+				Source: "Setter",
+				Field:  field.Name(),
+				Type:   field.Type().Name(),
+				Value:  value,
+				Err:    err,
+			}
+		}
+		return nil
 	}
 
 	if txt := TextUnmarshalerFrom(field); txt != nil {
-		return txt.UnmarshalText([]byte(value))
+		if err := txt.UnmarshalText([]byte(value)); err != nil {
+			return &errors.ParseError{
+				Source: "TextUnmarshaler",
+				Field:  field.Name(),
+				Type:   field.Type().Name(),
+				Value:  value,
+				Err:    err,
+			}
+		}
+		return nil
 	}
 
 	if bin := BinaryUnmarshalerFrom(field); bin != nil {
 		// TODO: should we decode base64 or hex data here?
-		return bin.UnmarshalBinary([]byte(value))
+		if err := bin.UnmarshalBinary([]byte(value)); err != nil {
+			return &errors.ParseError{
+				Source: "BinaryUnmarshaler",
+				Field:  field.Name(),
+				Type:   field.Type().Name(),
+				Value:  value,
+				Err:    err,
+			}
+		}
+		return nil
 	}
 
-	return parse(value, field.Reflect())
+	if err := parse(value, field.Reflect()); err != nil {
+		return &errors.ParseError{
+			Field: field.Name(),
+			Type:  field.Type().Name(),
+			Value: value,
+			Err:   err,
+		}
+	}
+	return nil
 }
 
 func parse(value string, field reflect.Value) (err error) {

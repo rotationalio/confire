@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/rotationalio/confire/errors"
+	"github.com/rotationalio/confire/parse"
 	"github.com/rotationalio/confire/structs"
 )
 
@@ -104,20 +105,22 @@ func Gather(prefix string, spec interface{}) (infos []Info, err error) {
 		infos = append(infos, info)
 
 		if field.Kind() == reflect.Struct {
-			// TODO: honor Decode if present
-			innerPrefix := prefix
-			if !field.IsEmbedded() {
-				innerPrefix = info.Key
-			}
+			// honor Decode interfaces if present
+			if !parse.IsDecodable(field) {
+				innerPrefix := prefix
+				if !field.IsEmbedded() {
+					innerPrefix = info.Key
+				}
 
-			embeddedPtr := field.Pointer()
-			embeddedInfos, err := Gather(innerPrefix, embeddedPtr)
-			if err != nil {
-				return nil, err
-			}
+				embeddedPtr := field.Pointer()
+				embeddedInfos, err := Gather(innerPrefix, embeddedPtr)
+				if err != nil {
+					return nil, err
+				}
 
-			infos = append(infos[:len(infos)-1], embeddedInfos...)
-			continue
+				infos = append(infos[:len(infos)-1], embeddedInfos...)
+				continue
+			}
 		}
 
 	}

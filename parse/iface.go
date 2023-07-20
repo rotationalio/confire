@@ -18,6 +18,11 @@ type Setter interface {
 	Set(value string) error
 }
 
+// Returns true if the field implements one of the decodable interfaces.
+func IsDecodable(field *structs.Field) bool {
+	return DecoderFrom(field) != nil || SetterFrom(field) != nil || TextUnmarshalerFrom(field) != nil || BinaryUnmarshalerFrom(field) != nil
+}
+
 // Attempts to get a Decoder variable from the specified field.
 func DecoderFrom(field *structs.Field) (d Decoder) {
 	field.InterfaceFrom(func(v interface{}, ok *bool) { d, *ok = v.(Decoder) })
