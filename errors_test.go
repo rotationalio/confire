@@ -1,39 +1,95 @@
 package confire_test
 
 import (
-	"errors"
 	"testing"
 
-	. "github.com/rotationalio/confire"
+	"github.com/rotationalio/confire"
+	"github.com/rotationalio/confire/assert"
+	"github.com/rotationalio/confire/errors"
 )
 
-func TestParseError(t *testing.T) {
-	werr := errors.New("something bad happened")
-	err := &ParseError{
-		Source: "source",
-		Field:  "field",
-		Type:   "foo",
-		Value:  "value",
-		Err:    werr,
+func TestParserError(t *testing.T) {
+	testCases := []struct {
+		err error
+		ok  bool
+	}{
+		{errors.ErrInvalidSpecification, false},
+		{&errors.ParseError{Source: "a", Field: "b", Type: "c", Value: "d", Err: errors.ErrNotAStruct}, true},
+		{&errors.ValidationError{Source: "foo", Err: errors.ErrNotExported}, false},
 	}
 
-	assert(t, err.Is(werr), "parse error should wrap an error")
-	equals(t, werr, err.Unwrap())
-	equals(t, "confire: could not parse field from source: converting \"value\" to type foo: something bad happened", err.Error())
+	for _, tc := range testCases {
+		target, ok := confire.ParseError(tc.err)
+		if tc.ok {
+			assert.True(t, ok)
+			assert.Assert(t, target != nil, "expected target to be not nil")
+		} else {
+			assert.False(t, ok)
+			assert.Assert(t, target == nil, "expected target to be nil")
+		}
 
-	// This is to appease the linter for historical reasons and can probably be removed
-	// if you're reading this; sorry it got left here for so long.
-	ok(t, nil)
+	}
+}
+
+func TestIsParserError(t *testing.T) {
+	testCases := []struct {
+		err    error
+		assert assert.BoolAssertion
+	}{
+		{errors.ErrInvalidSpecification, assert.False},
+		{errors.ErrNotAStruct, assert.False},
+		{errors.ErrNotExported, assert.False},
+		{errors.ErrNotSettable, assert.False},
+		{&errors.ParseError{}, assert.True},
+		{&errors.ParseError{Source: "a", Field: "b", Type: "c", Value: "d", Err: errors.ErrNotAStruct}, assert.True},
+		{&errors.ValidationError{}, assert.False},
+		{&errors.ValidationError{Source: "foo", Err: errors.ErrNotExported}, assert.False},
+	}
+
+	for _, tc := range testCases {
+		tc.assert(t, confire.IsParseError(tc.err))
+	}
 }
 
 func TestValidationError(t *testing.T) {
-	werr := errors.New("that's not right")
-	err := &ValidationError{
-		Source: "source",
-		Err:    werr,
+	testCases := []struct {
+		err error
+		ok  bool
+	}{
+		{errors.ErrInvalidSpecification, false},
+		{&errors.ParseError{Source: "a", Field: "b", Type: "c", Value: "d", Err: errors.ErrNotAStruct}, false},
+		{&errors.ValidationError{Source: "foo", Err: errors.ErrNotExported}, true},
 	}
 
-	assert(t, err.Is(werr), "parse error should wrap an error")
-	equals(t, werr, err.Unwrap())
-	equals(t, "invalid configuration: that's not right", err.Error())
+	for _, tc := range testCases {
+		target, ok := confire.ValidationError(tc.err)
+		if tc.ok {
+			assert.True(t, ok)
+			assert.Assert(t, target != nil, "expected target to be not nil")
+		} else {
+			assert.False(t, ok)
+			assert.Assert(t, target == nil, "expected target to be nil")
+		}
+
+	}
+}
+
+func TestIsValidationError(t *testing.T) {
+	testCases := []struct {
+		err    error
+		assert assert.BoolAssertion
+	}{
+		{errors.ErrInvalidSpecification, assert.False},
+		{errors.ErrNotAStruct, assert.False},
+		{errors.ErrNotExported, assert.False},
+		{errors.ErrNotSettable, assert.False},
+		{&errors.ParseError{}, assert.False},
+		{&errors.ParseError{Source: "a", Field: "b", Type: "c", Value: "d", Err: errors.ErrNotAStruct}, assert.False},
+		{&errors.ValidationError{}, assert.True},
+		{&errors.ValidationError{Source: "foo", Err: errors.ErrNotExported}, assert.True},
+	}
+
+	for _, tc := range testCases {
+		tc.assert(t, confire.IsValidationError(tc.err))
+	}
 }
