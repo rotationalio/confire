@@ -38,3 +38,17 @@ func TestValidationError(t *testing.T) {
 	assert.Equals(t, werr, err.Unwrap())
 	assert.Equals(t, "invalid configuration: that's not right", err.Error())
 }
+
+func TestValidationErrors(t *testing.T) {
+	errs := make(ValidationErrors, 0, 3)
+	assert.Equals(t, "0 validation errors occurred:", errs.Error())
+
+	errs = append(errs, &ValidationError{Source: "Name", Err: ErrMissingRequiredField})
+	assert.Equals(t, "invalid configuration: required field is zero valued", errs.Error())
+
+	errs = append(errs, &ValidationError{Source: "Colors", Err: errors.New("at least one color should be specified")})
+	assert.Equals(t, "2 validation errors occurred:\n    - invalid configuration: required field is zero valued\n    - invalid configuration: at least one color should be specified", errs.Error())
+
+	errs = append(errs, &ValidationError{Source: "Port", Err: errors.New("port number out of range")})
+	assert.Equals(t, "3 validation errors occurred:\n    - invalid configuration: required field is zero valued\n    - invalid configuration: at least one color should be specified\n    - invalid configuration: port number out of range", errs.Error())
+}

@@ -1,6 +1,35 @@
 package confire
 
-func Process(prefix string, spec interface{}, opts ...Option) error {
+import (
+	"github.com/rotationalio/confire/defaults"
+	"github.com/rotationalio/confire/env"
+	"github.com/rotationalio/confire/validate"
+)
+
+func Process(prefix string, spec interface{}, opts ...Option) (err error) {
+	var opt *options
+	if opt, err = makeOptions(opts...); err != nil {
+		return err
+	}
+
+	if !opt.noDefaults {
+		if err = defaults.Process(spec); err != nil {
+			return err
+		}
+	}
+
+	if !opt.noEnv {
+		if err = env.Process(prefix, spec); err != nil {
+			return err
+		}
+	}
+
+	if !opt.noValidate {
+		if err = validate.Validate(spec); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
