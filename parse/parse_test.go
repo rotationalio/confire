@@ -100,7 +100,7 @@ type Specification struct {
 	ColorNames map[string]Color
 	Multi      []Escape
 	Link       CustomURL
-	// LinkTo     *CustomURL
+	LinkTo     *CustomURL
 	EmptyMap   map[string]int
 	EmptySlice []string
 }

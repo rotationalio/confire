@@ -45,12 +45,8 @@ func Process(spec interface{}) (err error) {
 				}
 
 				// nil pointer to a struct: create a zero-instance
-				if err = field.Set(reflect.New(field.Type().Elem())); err != nil {
-					return &errors.ParseError{
-						Source: "defaults",
-						Field:  field.Name(),
-						Err:    err,
-					}
+				if err = field.Init(); err != nil {
+					return err
 				}
 			}
 			field = field.Elem()

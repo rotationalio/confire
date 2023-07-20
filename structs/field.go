@@ -19,7 +19,6 @@ func getFields(v reflect.Value) (fields []*Field) {
 			field: f,
 			value: v.FieldByName(f.Name),
 		}
-
 		fields = append(fields, field)
 	}
 
@@ -155,6 +154,19 @@ func (f *Field) Set(val interface{}) error {
 func (f *Field) Zero() error {
 	zero := reflect.Zero(f.value.Type()).Interface()
 	return f.Set(zero)
+}
+
+// Initialize a nil pointer to point to a zero-valued version of the struct.
+func (f *Field) Init() error {
+	if f.value.Kind() != reflect.Ptr {
+		return errors.ErrNotAStruct
+	}
+
+	if f.IsNil() && f.TypeKind() == reflect.Struct {
+		newStruct := reflect.New(f.Type().Elem())
+		f.value.Set(newStruct)
+	}
+	return nil
 }
 
 // InterfaceFrom is a complex type assertion that allows you to pass in a function that

@@ -78,6 +78,19 @@ func Parse(value string, field reflect.Value) error {
 
 // ParseField parses the given type from the field and sets it.
 func ParseField(value string, field *structs.Field) error {
+	for field.Kind() == reflect.Ptr {
+		if field.IsNil() {
+			if field.TypeKind() != reflect.Struct {
+				break
+			}
+
+			if err := field.Init(); err != nil {
+				return err
+			}
+		}
+		field = field.Elem()
+	}
+
 	// Attempt to use the decoder, setter, and unmarshalers to parse the field.
 	if decoder := DecoderFrom(field); decoder != nil {
 		if err := decoder.Decode(value); err != nil {
