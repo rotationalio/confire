@@ -8,46 +8,45 @@ import (
 	"testing"
 	"time"
 
+	"github.com/rotationalio/confire/assert"
 	. "github.com/rotationalio/confire/env"
 )
 
 const testPrefix = "confire"
 
 type Specification struct {
-	Embedded                     `desc:"can we document a struct"`
-	EmbeddedButIgnored           `ignored:"true"`
-	Debug                        bool
-	Port                         int
-	Rate                         float32
-	User                         string
-	TTL                          uint32
-	Timeout                      time.Duration
-	AdminUsers                   []string
-	MagicNumbers                 []int
-	EmptyNumbers                 []int
-	ByteSlice                    []byte
-	ColorCodes                   map[string]int
-	MultiWordVar                 string
-	MultiWordVarWithAutoSplit    uint32 `split_words:"true"`
-	MultiWordACRWithAutoSplit    uint32 `split_words:"true"`
-	SomePointer                  *string
-	SomePointerWithDefault       *string `default:"foo2baz" desc:"foorbar is the word"`
-	MultiWordVarWithAlt          string  `envconfig:"MULTI_WORD_VAR_WITH_ALT" desc:"what alt"`
-	MultiWordVarWithLowerCaseAlt string  `envconfig:"multi_word_var_with_lower_case_alt"`
-	NoPrefixWithAlt              string  `envconfig:"SERVICE_HOST"`
-	DefaultVar                   string  `default:"foobar"`
-	RequiredVar                  string  `required:"True"`
-	NoPrefixDefault              string  `envconfig:"BROKER" default:"127.0.0.1"`
-	RequiredDefault              string  `required:"true" default:"foo2bar"`
-	Ignored                      string  `ignored:"true"`
-	NestedSpecification          struct {
-		Property            string `envconfig:"inner"`
-		PropertyWithDefault string `default:"fuzzybydefault"`
+	Embedded                        `desc:"can we document a struct"`
+	EmbeddedButIgnored              `ignored:"true"`
+	Debug                           bool
+	Port                            int
+	Rate                            float32
+	User                            string
+	TTL                             uint32
+	Timeout                         time.Duration
+	AdminUsers                      []string
+	MagicNumbers                    []int
+	EmptyNumbers                    []int
+	ByteSlice                       []byte
+	ColorCodes                      map[string]int
+	MultiWordVar                    string
+	MultiWordVarWithAutoSplit       uint32 `split_words:"true"`
+	MultiWordACRWithAutoSplit       uint32 `split_words:"true"`
+	SomePointer                     *string
+	MultiWordVarWithAlt             string `envconfig:"MULTI_WORD_VAR_WITH_ALT" desc:"what alt"`
+	MultiWordVarWithLowerCaseAlt    string `envconfig:"multi_word_var_with_lower_case_alt"`
+	NoPrefixWithAlt                 string `envconfig:"SERVICE_HOST"`
+	NoPrefixWithAltEnv              string `env:"SERVICE_HOSTNAME"`
+	MultiWordVarWithAltEnv          string `env:"MULTI_WORD_VAR_WITH_ALT_ENV" desc:"what alt"`
+	MultiWordVarWithLowerCaseAltEnv string `env:"multi_word_var_with_lower_case_alt_env"`
+	Ignored                         string `ignored:"true"`
+	NestedSpecification             struct {
+		Property         string `envconfig:"inner"`
+		PropertyNoPrefix string `env:"OUTER_INNER"`
 	} `envconfig:"outer"`
 	AfterNested  string
 	DecodeStruct HonorDecodeInStruct `envconfig:"honor"`
 	Datetime     time.Time
-	MapField     map[string]string `default:"one:two,three:four"`
+	MapField     map[string]string
 	UrlValue     CustomURL
 	UrlPointer   *CustomURL
 }
@@ -57,7 +56,7 @@ type Embedded struct {
 	EmbeddedPort        int
 	MultiWordVar        string
 	MultiWordVarWithAlt string `envconfig:"MULTI_WITH_DIFFERENT_ALT"`
-	EmbeddedAlt         string `envconfig:"EMBEDDED_WITH_ALT"`
+	EmbeddedAlt         string `env:"EMBEDDED_WITH_ALT"`
 	EmbeddedIgnored     string `ignored:"true"`
 }
 
@@ -123,13 +122,14 @@ var testEnv = map[string]string{
 	"CONFIRE_ADMINUSERS":                     "werewolf,vampire,ghast",
 	"CONFIRE_MAGICNUMBERS":                   "3,7,12",
 	"CONFIRE_EMPTYNUMBERS":                   "",
-	"CONFIRE_BYTE_SLICE":                     "theeaglefliesatmidnight",
-	"CONFIRE_COLOR_CODES":                    "red:1,green:2,blue:3",
+	"CONFIRE_BYTESLICE":                      "theeaglefliesatmidnight",
+	"CONFIRE_COLORCODES":                     "red:1,green:2,blue:3",
 	"SERVICE_HOST":                           "127.0.0.7",
 	"CONFIRE_TTL":                            "30",
 	"CONFIRE_REQUIREDVAR":                    "foo",
 	"CONFIRE_IGNORED":                        "was-not-ignored",
 	"CONFIRE_OUTER_INNER":                    "iamnested",
+	"OUTER_INNER":                            "iamouterinner",
 	"CONFIRE_AFTERNESTED":                    "after",
 	"CONFIRE_HONOR":                          "honor",
 	"CONFIRE_DATETIME":                       "2023-07-19T14:53:06Z",
@@ -137,6 +137,99 @@ var testEnv = map[string]string{
 	"CONFIRE_MULTI_WORD_ACR_WITH_AUTO_SPLIT": "25",
 	"CONFIRE_URLVALUE":                       "https://rotational.io/blog/",
 	"CONFIRE_URLPOINTER":                     "https://rotational.io/blog/",
+}
+
+func TestProcess(t *testing.T) {
+	t.Cleanup(cleanupEnv())
+	setEnv()
+
+	var s Specification
+	err := Process(testPrefix, &s)
+	assert.Ok(t, err)
+
+	assert.Equals(t, "127.0.0.7", s.NoPrefixWithAlt)
+	assert.True(t, s.Debug)
+	assert.Equals(t, 8888, s.Port)
+	assert.Equals(t, float32(0.25), s.Rate)
+	assert.Equals(t, uint32(30), s.TTL)
+	assert.Equals(t, "werebear", s.User)
+	assert.Equals(t, 5*time.Minute, s.Timeout)
+	assert.Equals(t, []string{"werewolf", "vampire", "ghast"}, s.AdminUsers)
+	assert.Equals(t, []int{3, 7, 12}, s.MagicNumbers)
+	assert.True(t, len(s.EmptyNumbers) == 0)
+	assert.Equals(t, []byte("theeaglefliesatmidnight"), s.ByteSlice)
+	assert.Equals(t, "", s.Ignored)
+	assert.Equals(t, map[string]int{"red": 1, "green": 2, "blue": 3}, s.ColorCodes)
+	assert.Equals(t, "iamnested", s.NestedSpecification.Property)
+	assert.Equals(t, "iamouterinner", s.NestedSpecification.PropertyNoPrefix)
+	assert.Equals(t, "after", s.AfterNested)
+	assert.Equals(t, "decoded", s.DecodeStruct.Value)
+	assert.Equals(t, time.Date(2023, 7, 19, 14, 53, 6, 0, time.UTC), s.Datetime)
+	assert.Equals(t, uint32(24), s.MultiWordVarWithAutoSplit)
+	assert.Equals(t, uint32(25), s.MultiWordACRWithAutoSplit)
+
+	u, err := url.Parse("https://rotational.io/blog/")
+	assert.Ok(t, err)
+
+	assert.Equals(t, *u, *s.UrlValue.Value)
+	assert.Equals(t, *u, *s.UrlPointer.Value)
+}
+
+func TestCustomValueFields(t *testing.T) {
+	t.Cleanup(cleanupEnv())
+
+	var s struct {
+		Foo    string
+		Bar    bracketed
+		Baz    quoted
+		Struct setterStruct
+	}
+
+	// Set would panic when the receiver is nil,
+	// so make sure it has an initial value to replace.
+	s.Baz = quoted{new(bracketed)}
+
+	os.Setenv("CONFIRE_FOO", "foo")
+	os.Setenv("CONFIRE_BAR", "bar")
+	os.Setenv("CONFIRE_BAZ", "baz")
+	os.Setenv("CONFIRE_STRUCT", "inner")
+
+	err := Process(testPrefix, &s)
+	assert.Ok(t, err)
+
+	assert.Equals(t, "foo", s.Foo)
+	assert.Equals(t, "[bar]", s.Bar.String())
+	assert.Equals(t, `["baz"]`, s.Baz.String())
+	assert.Equals(t, `setterstruct{"inner"}`, s.Struct.Inner)
+}
+
+func TestCustomPointerFields(t *testing.T) {
+	t.Cleanup(cleanupEnv())
+
+	var s struct {
+		Foo    string
+		Bar    *bracketed
+		Baz    *quoted
+		Struct *setterStruct
+	}
+
+	// Set would panic when the receiver is nil,
+	// so make sure they have initial values to replace.
+	s.Bar = new(bracketed)
+	s.Baz = &quoted{new(bracketed)}
+
+	os.Setenv("CONFIRE_FOO", "foo")
+	os.Setenv("CONFIRE_BAR", "bar")
+	os.Setenv("CONFIRE_BAZ", "baz")
+	os.Setenv("CONFIRE_STRUCT", "inner")
+
+	err := Process(testPrefix, &s)
+	assert.Ok(t, err)
+
+	assert.Equals(t, "foo", s.Foo)
+	assert.Equals(t, "[bar]", s.Bar.String())
+	assert.Equals(t, `["baz"]`, s.Baz.String())
+	assert.Equals(t, `setterstruct{"inner"}`, s.Struct.Inner)
 }
 
 func BenchmarkGather(b *testing.B) {

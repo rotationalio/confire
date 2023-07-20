@@ -46,7 +46,7 @@ func Process(spec interface{}) (err error) {
 
 				// nil pointer to a struct: create a zero-instance
 				if err = field.Init(); err != nil {
-					return err
+					panic(err)
 				}
 			}
 			field = field.Elem()
@@ -66,6 +66,13 @@ func Process(spec interface{}) (err error) {
 	}
 
 	return nil
+}
+
+// MustProcess is the same as Process but panics if an error occurs
+func MustProcess(spec interface{}) {
+	if err := Process(spec); err != nil {
+		panic(err)
+	}
 }
 
 // SetDefaults is an alias of Process

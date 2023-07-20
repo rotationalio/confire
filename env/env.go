@@ -8,10 +8,13 @@ package env
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
+
+	goerrs "errors"
 
 	"github.com/rotationalio/confire/errors"
 	"github.com/rotationalio/confire/parse"
@@ -21,10 +24,46 @@ import (
 const (
 	tagIgnored    = "ignored"
 	tagSplitWords = "split_words"
-	tagEnv        = "envconfig"
-	tagDefault    = "default"
-	tagRequired   = "required"
+	tagEnvConfig  = "envconfig"
+	tagEnv        = "env"
 )
+
+// Process populates the specified struct based on environment variables.
+func Process(prefix string, spec interface{}) error {
+	infos, err := Gather(prefix, spec)
+
+	for _, info := range infos {
+		// Try to find the environment variable
+		value, ok := os.LookupEnv(info.Key)
+		if !ok && info.Alt != "" {
+			value, ok = os.LookupEnv(info.Alt)
+		}
+
+		// If we didn't find an environment variable, skip the field
+		if !ok {
+			continue
+		}
+
+		// Process the field from the environment
+		if err = parse.ParseField(value, info.Field); err != nil {
+			target := &errors.ParseError{}
+			if goerrs.As(err, &target) {
+				target.Source = info.Key
+				return target
+			}
+			return err
+		}
+	}
+
+	return err
+}
+
+// MustProcess is the same as Process but panics if an error occurs
+func MustProcess(prefix string, spec interface{}) {
+	if err := Process(prefix, spec); err != nil {
+		panic(err)
+	}
+}
 
 type Info struct {
 	Name  string         // Name of the field to compute the envvar from
@@ -62,7 +101,9 @@ func Gather(prefix string, spec interface{}) (infos []Info, err error) {
 				}
 
 				// nil pointer to a struct: create a zero-instance
-				field.Set(reflect.New(field.Type().Elem()))
+				if err = field.Init(); err != nil {
+					panic(err)
+				}
 			}
 			field = field.Elem()
 		}
@@ -70,7 +111,7 @@ func Gather(prefix string, spec interface{}) (infos []Info, err error) {
 		// Capture information about the config variable
 		info := Info{
 			Name:  field.Name(),
-			Alt:   strings.ToUpper(field.Tag(tagEnv)),
+			Alt:   strings.ToUpper(oneOf(field.Tag(tagEnv), field.Tag(tagEnvConfig))),
 			Field: field,
 		}
 
@@ -131,4 +172,13 @@ func Gather(prefix string, spec interface{}) (infos []Info, err error) {
 func isTrue(s string) bool {
 	b, _ := strconv.ParseBool(s)
 	return b
+}
+
+func oneOf(strs ...string) string {
+	for _, s := range strs {
+		if s != "" {
+			return s
+		}
+	}
+	return ""
 }
