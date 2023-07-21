@@ -1,0 +1,17 @@
+This·application·is·configured·via·the·environment.·The·following·environment
+variables·can·be·used:
+
+KEY·························TYPE···········································DEFAULT···········REQUIRED····DESCRIPTION
+CONFIRE_ADMINS··············Comma-separated·list·of·String:String·pairs······················true········map·username·to·password
+CONFIRE_ROLES···············Comma-separated·list·of·String·················observer,admin················
+CONFIRE_AUTHURL·············CustomURL························································true········
+CONFIRE_DEBUG···············True·or·False··································false·························
+CONFIRE_HOST················String···························································true········
+CONFIRE_PORT················Integer··························································true········
+CONFIRE_RATE················Float··········································0.25··························value·between·0·and·1
+CONFIRE_CANCEL··············Unsigned·Integer·······························16····························
+CONFIRE_LOG_LEVEL···········LogLevel·······································info··························
+CONFIRE_TIMEOUT·············Duration·······································30s···························amount·of·time·to·wait·for·a·respone
+CONFIRE_COLORS_PRIMARY······String·········································#cc6699·······················
+CONFIRE_COLORS_SECONDARY····String·········································#eeffee·······················
+CONFIRE_SENDGRID_API_KEY····String·······································································
