@@ -5,6 +5,7 @@ an environment variable or from a struct field) into a Go type for the struct.
 package parse
 
 import (
+	"encoding/base64"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -54,8 +55,10 @@ func Parse(value string, field reflect.Value) error {
 	}
 
 	if bin := BinaryUnmarshalerFromValue(field); bin != nil {
-		// TODO: should we decode base64 or hex data here?
-		if err := bin.UnmarshalBinary([]byte(value)); err != nil {
+		// Try to decode base64 data from the value otherwise convert to []byte
+		data := toBytes(value)
+
+		if err := bin.UnmarshalBinary(data); err != nil {
 			return &errors.ParseError{
 				Source: "BinaryUnmarshaler",
 				Type:   field.Type().Name(),
@@ -132,8 +135,10 @@ func ParseField(value string, field *structs.Field) error {
 	}
 
 	if bin := BinaryUnmarshalerFrom(field); bin != nil {
-		// TODO: should we decode base64 or hex data here?
-		if err := bin.UnmarshalBinary([]byte(value)); err != nil {
+		// Try to decode base64 data from the value otherwise convert to []byte
+		data := toBytes(value)
+
+		if err := bin.UnmarshalBinary(data); err != nil {
 			return &errors.ParseError{
 				Source: "BinaryUnmarshaler",
 				Field:  field.Name(),
@@ -212,7 +217,7 @@ func parse(value string, field reflect.Value) (err error) {
 	case reflect.Slice:
 		sl := reflect.MakeSlice(typ, 0, 0)
 		if typ.Elem().Kind() == reflect.Uint8 {
-			sl = reflect.ValueOf([]byte(value))
+			sl = reflect.ValueOf(toBytes(value))
 		} else if strings.TrimSpace(value) != "" {
 			vals := strings.Split(value, ",")
 			sl = reflect.MakeSlice(typ, len(vals), len(vals))
@@ -251,4 +256,11 @@ func parse(value string, field reflect.Value) (err error) {
 	}
 
 	return nil
+}
+
+func toBytes(v string) []byte {
+	if data, err := base64.StdEncoding.DecodeString(v); err == nil {
+		return data
+	}
+	return []byte(v)
 }
