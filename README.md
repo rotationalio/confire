@@ -32,8 +32,8 @@ import (
 type Config struct {
 	Debug   bool
 	Port    int            `required:"true"`
-	Level   string  	   `default:"info"`
-	Rate    float64 	   `default:"1.0"`
+	Level   string         `default:"info"`
+	Rate    float64        `default:"1.0"`
 	Timeout time.Duration  `desc:"read timeout"`
 	Colors  map[string]int `desc:"at least three colors required"`
 	Peers   []string
@@ -238,8 +238,8 @@ import "github.com/rotationalio/confire/usage"
 type Config struct {
 	Debug   bool
 	Port    int            `required:"true"`
-	Level   string  	   `default:"info"`
-	Rate    float64 	   `default:"1.0"`
+	Level   string         `default:"info"`
+	Rate    float64        `default:"1.0"`
 	Timeout time.Duration  `desc:"read timeout"`
 	Colors  map[string]int `desc:"at least three colors required"`
 	Peers   []string
