@@ -68,6 +68,7 @@ func TestParseField(t *testing.T) {
 		"LinkTo":     {"https://rotational.io", &CustomURL{Value: r8l}},
 		"EmptyMap":   {"", map[string]int{}},
 		"EmptySlice": {"", []string{}},
+		"ByteSlice":  {"n2LeUR98zrfDdAcJAu58Eg==", []byte{0x9f, 0x62, 0xde, 0x51, 0x1f, 0x7c, 0xce, 0xb7, 0xc3, 0x74, 0x7, 0x9, 0x2, 0xee, 0x7c, 0x12}},
 	}
 
 	for _, field := range s.Fields() {
@@ -103,6 +104,7 @@ type Specification struct {
 	LinkTo     *CustomURL
 	EmptyMap   map[string]int
 	EmptySlice []string
+	ByteSlice  []byte
 }
 
 type Color [3]uint8
