@@ -32,7 +32,7 @@ type Field struct {
 	field reflect.StructField
 }
 
-// Tag returns the value assocaited with the key in the tag string. If there is no such
+// Tag returns the value associated with the key in the tag string. If there is no such
 // key in the tag, an empty string is returned.
 func (f *Field) Tag(key string) string {
 	return f.field.Tag.Get(key)

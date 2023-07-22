@@ -6,6 +6,12 @@ import (
 	"github.com/rotationalio/confire/validate"
 )
 
+// Process is the main entry point to configuring and validating a struct from defaults
+// and the environment. Pass in a prefix for environment variables and a pointer to the
+// configuration struct you want processed (as well as any options). The processor will
+// first populate the struct with defaults, then load any values found in the
+// environment, finally validating the struct based on struct tags and the validate
+// interface. A ParseError or a ValidationError may be returned if not successful.
 func Process(prefix string, spec interface{}, opts ...Option) (err error) {
 	var opt *options
 	if opt, err = makeOptions(opts...); err != nil {
