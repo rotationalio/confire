@@ -59,9 +59,30 @@ func Gather(spec interface{}) (infos []Info, err error) {
 
 	infos = make([]Info, 0, s.NumField())
 	for _, field := range s.Fields() {
+		// If the field is unexported, skip the field
+		if !field.IsExported() {
+			continue
+		}
+
 		// If the ignored tag is set or the validator is set to ignored, skip the field
 		if isTrue(field.Tag(tagIgnored)) || ignoreValidation(field.Tag(tagValidator)) {
 			continue
+		}
+
+		// Handle pointers if necessary
+		for field.Kind() == reflect.Pointer {
+			if field.IsNil() {
+				if field.TypeKind() != reflect.Struct {
+					// nil pointer to a non-struct: leave it alone.
+					break
+				}
+
+				// nil pointer to a struct: create a zero-instance
+				if err = field.Init(); err != nil {
+					panic(fmt.Errorf("could not create zero instance: %w", err))
+				}
+			}
+			field = field.Elem()
 		}
 
 		// If this is a struct then gather validators for the nested fields
