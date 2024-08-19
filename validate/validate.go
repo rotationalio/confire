@@ -3,6 +3,7 @@ package validate
 import (
 	goerrors "errors"
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -63,6 +64,15 @@ func Gather(spec interface{}) (infos []Info, err error) {
 			continue
 		}
 
+		// If this is a struct then gather validators for the nested fields
+		if field.Kind() == reflect.Struct {
+			var subinfos []Info
+			if subinfos, err = Gather(field.Pointer()); err != nil {
+				return nil, err
+			}
+			infos = append(infos, subinfos...)
+		}
+
 		// Chain validators together if necessary
 		validators := make([]Validator, 0, 3)
 
@@ -106,7 +116,7 @@ func Gather(spec interface{}) (infos []Info, err error) {
 }
 
 type Info struct {
-	Field    *structs.Field // The actual field to set the envvar from (along with tags)
+	Field    *structs.Field // The actual field to get the validation info from (along with tags)
 	Validate Validator      // The validator to apply to the field
 }
 
