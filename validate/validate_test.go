@@ -79,6 +79,96 @@ func TestRequired(t *testing.T) {
 	assert.Ok(t, err)
 }
 
+func TestNestedRequired(t *testing.T) {
+	type Specification struct {
+		Nested NestedRequired `required:"true"`
+	}
+
+	invalid := &Specification{}
+	err := validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	invalid = &Specification{Nested: NestedRequired{}}
+	err = validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	invalid = &Specification{Nested: NestedRequired{PropC: "baz"}}
+	err = validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	invalid = &Specification{Nested: NestedRequired{PropA: "foo"}}
+	err = validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	invalid = &Specification{Nested: NestedRequired{PropB: 32}}
+	err = validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	valid := &Specification{Nested: NestedRequired{PropA: "foo", PropB: 32}}
+	err = validate.Validate(valid)
+	assert.Ok(t, err)
+}
+
+func TestNestedFieldsRequired(t *testing.T) {
+	type Specification struct {
+		Nested NestedRequired
+	}
+
+	invalid := &Specification{}
+	err := validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	invalid = &Specification{Nested: NestedRequired{}}
+	err = validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	invalid = &Specification{Nested: NestedRequired{PropC: "baz"}}
+	err = validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	invalid = &Specification{Nested: NestedRequired{PropA: "foo"}}
+	err = validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	invalid = &Specification{Nested: NestedRequired{PropB: 32}}
+	err = validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	valid := &Specification{Nested: NestedRequired{PropA: "foo", PropB: 32}}
+	err = validate.Validate(valid)
+	assert.Ok(t, err)
+}
+
+func TestNestedPointerRequired(t *testing.T) {
+	type Specification struct {
+		Nested *NestedRequired
+	}
+
+	invalid := &Specification{}
+	err := validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	invalid = &Specification{Nested: &NestedRequired{}}
+	err = validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	invalid = &Specification{Nested: &NestedRequired{PropC: "baz"}}
+	err = validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	invalid = &Specification{Nested: &NestedRequired{PropA: "foo"}}
+	err = validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	invalid = &Specification{Nested: &NestedRequired{PropB: 32}}
+	err = validate.Validate(invalid)
+	assert.Assert(t, err != nil, "expected a validation error to have occurred")
+
+	valid := &Specification{Nested: &NestedRequired{PropA: "foo", PropB: 32}}
+	err = validate.Validate(valid)
+	assert.Ok(t, err)
+}
+
 func TestRequiredTypes(t *testing.T) {
 	type Specification struct {
 		Ptr       *string        `required:"true"`
@@ -148,6 +238,7 @@ type Nested struct {
 type NestedRequired struct {
 	PropA string `required:"true"`
 	PropB int64  `required:"true"`
+	PropC string
 }
 
 type Age int

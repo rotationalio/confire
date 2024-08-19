@@ -98,13 +98,13 @@ var (
 
 func implementsInterface(t reflect.Type) bool {
 	return t.Implements(decoderType) ||
-		reflect.PtrTo(t).Implements(decoderType) ||
+		reflect.PointerTo(t).Implements(decoderType) ||
 		t.Implements(setterType) ||
-		reflect.PtrTo(t).Implements(setterType) ||
+		reflect.PointerTo(t).Implements(setterType) ||
 		t.Implements(textUnmarshalerType) ||
-		reflect.PtrTo(t).Implements(textUnmarshalerType) ||
+		reflect.PointerTo(t).Implements(textUnmarshalerType) ||
 		t.Implements(binaryUnmarshalerType) ||
-		reflect.PtrTo(t).Implements(binaryUnmarshalerType)
+		reflect.PointerTo(t).Implements(binaryUnmarshalerType)
 }
 
 // toTypeDescription converts Go types into a human readable description
