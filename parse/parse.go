@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rotationalio/confire/errors"
-	"github.com/rotationalio/confire/structs"
+	"go.rtnl.ai/confire/errors"
+	"go.rtnl.ai/confire/structs"
 )
 
 func Parse(value string, field reflect.Value) error {

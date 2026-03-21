@@ -4,9 +4,9 @@ import (
 	"encoding"
 	"testing"
 
-	"github.com/rotationalio/confire/assert"
-	. "github.com/rotationalio/confire/parse"
-	"github.com/rotationalio/confire/structs"
+	"go.rtnl.ai/confire/assert"
+	. "go.rtnl.ai/confire/parse"
+	"go.rtnl.ai/confire/structs"
 )
 
 type Does struct{}

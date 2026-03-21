@@ -1,15 +1,15 @@
 # Confire
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/rotationalio/confire.svg)](https://pkg.go.dev/github.com/rotationalio/confire)
+[![Go Reference](https://pkg.go.dev/badge/go.rtnl.ai/confire.svg)](https://pkg.go.dev/go.rtnl.ai/confire)
 [![Tests](https://github.com/rotationalio/confire/actions/workflows/test.yaml/badge.svg)](https://github.com/rotationalio/confire/actions/workflows/test.yaml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/rotationalio/confire)](https://goreportcard.com/report/github.com/rotationalio/confire)
+[![Go Report Card](https://goreportcard.com/badge/go.rtnl.ai/confire)](https://goreportcard.com/report/go.rtnl.ai/confire)
 
 **Configuration management for services and distributed systems**
 
 ## Install
 
 ```
-$ go get github.com/rotationalio/confire
+$ go get go.rtnl.ai/confire
 ```
 
 ## Usage
@@ -26,7 +26,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/rotationalio/confire"
+	"go.rtnl.ai/confire"
 )
 
 type Config struct {
@@ -120,8 +120,8 @@ Currently confire supports parsing these struct field types:
 - maps (keys and values of any supported type)
 - [encoding.TextUnmarshaler](https://golang.org/pkg/encoding/#TextUnmarshaler)
 - [encoding.BinaryUnmarshaler](https://golang.org/pkg/encoding/#BinaryUnmarshaler)
-- [parse.Decoder](https://pkg.go.dev/github.com/rotationalio/confire/parse#Decoder)
-- [parse.Setter](https://pkg.go.dev/github.com/rotationalio/confire/parse#Setter)
+- [parse.Decoder](https://pkg.go.dev/go.rtnl.ai/confire/parse#Decoder)
+- [parse.Setter](https://pkg.go.dev/go.rtnl.ai/confire/parse#Setter)
 
 Note that `time.Time` is also supported because it implements `encoding.TextUnmarshaler`.
 
@@ -134,7 +134,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/rotationalio/confire/defaults"
+	"go.rtnl.ai/confire/defaults"
 )
 
 type Config struct {
@@ -170,7 +170,7 @@ Coming soon!
 Confire automatically looks for an environment variable to set on your configuration struct based on the name of the struct variable. Consider the following go code:
 
 ```go
-import "github.com/rotationalio/confire/env"
+import "go.rtnl.ai/confire/env"
 
 type Config struct {
 	Enabled    bool

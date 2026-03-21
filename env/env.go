@@ -16,9 +16,9 @@ import (
 
 	goerrs "errors"
 
-	"github.com/rotationalio/confire/errors"
-	"github.com/rotationalio/confire/parse"
-	"github.com/rotationalio/confire/structs"
+	"go.rtnl.ai/confire/errors"
+	"go.rtnl.ai/confire/parse"
+	"go.rtnl.ai/confire/structs"
 )
 
 const (

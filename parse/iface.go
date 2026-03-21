@@ -4,7 +4,7 @@ import (
 	"encoding"
 	"reflect"
 
-	"github.com/rotationalio/confire/structs"
+	"go.rtnl.ai/confire/structs"
 )
 
 // Decoder has the same semantics as Setter, but takes higher precedence.

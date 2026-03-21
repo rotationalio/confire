@@ -12,8 +12,8 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/rotationalio/confire/assert"
-	"github.com/rotationalio/confire/usage"
+	"go.rtnl.ai/confire/assert"
+	"go.rtnl.ai/confire/usage"
 )
 
 func TestUsageDefault(t *testing.T) {

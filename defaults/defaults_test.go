@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rotationalio/confire/assert"
-	"github.com/rotationalio/confire/defaults"
+	"go.rtnl.ai/confire/assert"
+	"go.rtnl.ai/confire/defaults"
 )
 
 type Specification struct {

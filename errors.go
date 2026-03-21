@@ -3,7 +3,7 @@ package confire
 import (
 	"errors"
 
-	confireErrors "github.com/rotationalio/confire/errors"
+	confireErrors "go.rtnl.ai/confire/errors"
 )
 
 // Extract a parse error from an error if it is one.

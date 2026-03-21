@@ -1,9 +1,9 @@
 package confire
 
 import (
-	"github.com/rotationalio/confire/defaults"
-	"github.com/rotationalio/confire/env"
-	"github.com/rotationalio/confire/validate"
+	"go.rtnl.ai/confire/defaults"
+	"go.rtnl.ai/confire/env"
+	"go.rtnl.ai/confire/validate"
 )
 
 // Process is the main entry point to configuring and validating a struct from defaults

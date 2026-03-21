@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/rotationalio/confire/assert"
-	. "github.com/rotationalio/confire/errors"
+	"go.rtnl.ai/confire/assert"
+	. "go.rtnl.ai/confire/errors"
 )
 
 func TestParseError(t *testing.T) {

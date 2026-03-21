@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rotationalio/confire/assert"
-	"github.com/rotationalio/confire/structs"
+	"go.rtnl.ai/confire/assert"
+	"go.rtnl.ai/confire/structs"
 )
 
 func TestFieldMethods(t *testing.T) {
