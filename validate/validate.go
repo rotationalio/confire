@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rotationalio/confire/errors"
-	"github.com/rotationalio/confire/structs"
+	"go.rtnl.ai/confire/errors"
+	"go.rtnl.ai/confire/structs"
 )
 
 const (

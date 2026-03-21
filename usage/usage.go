@@ -11,8 +11,8 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/rotationalio/confire/env"
-	"github.com/rotationalio/confire/parse"
+	"go.rtnl.ai/confire/env"
+	"go.rtnl.ai/confire/parse"
 )
 
 const (

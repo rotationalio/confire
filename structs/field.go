@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/rotationalio/confire/errors"
+	"go.rtnl.ai/confire/errors"
 )
 
 func getFields(v reflect.Value) (fields []*Field) {

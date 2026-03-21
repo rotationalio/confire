@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/rotationalio/confire/structs"
+	"go.rtnl.ai/confire/structs"
 )
 
 // Merge updates the destination struct in-place with non-zero values from the source.

@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rotationalio/confire/assert"
-	confireErrors "github.com/rotationalio/confire/errors"
-	"github.com/rotationalio/confire/validate"
+	"go.rtnl.ai/confire/assert"
+	confireErrors "go.rtnl.ai/confire/errors"
+	"go.rtnl.ai/confire/validate"
 )
 
 func TestValidator(t *testing.T) {

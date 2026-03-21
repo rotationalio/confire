@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/rotationalio/confire/errors"
+	"go.rtnl.ai/confire/errors"
 )
 
 // Struct encapsulates a struct type to provide reflection around the struct.

@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rotationalio/confire/assert"
-	. "github.com/rotationalio/confire/env"
+	"go.rtnl.ai/confire/assert"
+	. "go.rtnl.ai/confire/env"
 )
 
 const testPrefix = "confire"

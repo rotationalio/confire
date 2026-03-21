@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rotationalio/confire/assert"
-	"github.com/rotationalio/confire/errors"
-	"github.com/rotationalio/confire/merge"
+	"go.rtnl.ai/confire/assert"
+	"go.rtnl.ai/confire/errors"
+	"go.rtnl.ai/confire/merge"
 )
 
 func TestMerge(t *testing.T) {

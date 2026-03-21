@@ -3,9 +3,9 @@ package confire_test
 import (
 	"testing"
 
-	"github.com/rotationalio/confire"
-	"github.com/rotationalio/confire/assert"
-	"github.com/rotationalio/confire/errors"
+	"go.rtnl.ai/confire"
+	"go.rtnl.ai/confire/assert"
+	"go.rtnl.ai/confire/errors"
 )
 
 func TestParserError(t *testing.T) {

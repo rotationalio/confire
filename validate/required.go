@@ -1,8 +1,8 @@
 package validate
 
 import (
-	"github.com/rotationalio/confire/errors"
-	"github.com/rotationalio/confire/structs"
+	"go.rtnl.ai/confire/errors"
+	"go.rtnl.ai/confire/structs"
 )
 
 // Required returns a validation error if the specified field is zero valued.
