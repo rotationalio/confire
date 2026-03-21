@@ -21,17 +21,26 @@ func IsParseError(err error) bool {
 	return errors.As(err, &target)
 }
 
-// Extract a validation error from an error if it is one.
-func ValidationError(err error) (*confireErrors.ValidationError, bool) {
-	target := &confireErrors.ValidationError{}
+// Extract a configuration error from an error if it is one.
+func InvalidConfig(err error) (*confireErrors.InvalidConfig, bool) {
+	target := &confireErrors.InvalidConfig{}
 	if ok := errors.As(err, &target); ok {
 		return target, true
 	}
 	return nil, false
 }
 
-// Returns true if the underlying error is a validation error.
-func IsValidationError(err error) bool {
-	target := &confireErrors.ValidationError{}
+// Returns true if the underlying error is a configuration error.
+func IsInvalidConfig(err error) bool {
+	target := &confireErrors.InvalidConfig{}
 	return errors.As(err, &target)
 }
+
+// Bringing in the errors from the errors package for convenience.
+var (
+	Required = confireErrors.Required
+	Invalid  = confireErrors.Invalid
+	Parse    = confireErrors.Parse
+	Wrap     = confireErrors.Wrap
+	Join     = confireErrors.Join
+)
