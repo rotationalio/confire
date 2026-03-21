@@ -1,7 +1,7 @@
 # Confire
 
 [![Go Reference](https://pkg.go.dev/badge/go.rtnl.ai/confire.svg)](https://pkg.go.dev/go.rtnl.ai/confire)
-[![Tests](https://go.rtnl.ai/confire/actions/workflows/test.yaml/badge.svg)](https://go.rtnl.ai/confire/actions/workflows/test.yaml)
+[![Tests](https://github.com/rotationalio/confire/actions/workflows/test.yaml/badge.svg)](https://github.com/rotationalio/confire/actions/workflows/test.yaml)
 [![Go Report Card](https://goreportcard.com/badge/go.rtnl.ai/confire)](https://goreportcard.com/report/go.rtnl.ai/confire)
 
 **Configuration management for services and distributed systems**
@@ -233,7 +233,7 @@ confire.Process(&conf, confire.NoEnv)
 Configuration structs get big fast, and it can be a real pain to manage them. To provide some assistance, confire provides a method for printing out the environment variables, types, required validation, and default values from your struct tags:
 
 ```go
-import "go.rtnl.ai/confire/usage"
+import "github.com/rotationalio/confire/usage"
 
 type Config struct {
 	Debug   bool
