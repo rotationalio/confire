@@ -66,7 +66,7 @@ func TestRequired(t *testing.T) {
 	err = validate.Validate(partial)
 	assert.Assert(t, err != nil, "expected a validation error to have occurred")
 
-	var single *confireErrors.ValidationError
+	var single *confireErrors.InvalidConfig
 	ok = errors.As(err, &single)
 	assert.True(t, ok)
 

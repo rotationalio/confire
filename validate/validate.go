@@ -160,13 +160,10 @@ func ignoreValidation(s string) bool {
 	return false
 }
 
-func asValidationError(err error, source string) *errors.ValidationError {
-	target := &errors.ValidationError{}
+func asValidationError(err error, source string) *errors.InvalidConfig {
+	target := &errors.InvalidConfig{}
 	if goerrors.As(err, &target) {
 		return target
 	}
-	return &errors.ValidationError{
-		Source: source,
-		Err:    err,
-	}
+	return errors.Wrap("", source, err.Error(), err)
 }

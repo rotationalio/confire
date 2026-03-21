@@ -16,10 +16,7 @@ type required struct {
 
 func (r required) Validate() error {
 	if r.field.IsZero() {
-		return &errors.ValidationError{
-			Source: r.field.Name(),
-			Err:    errors.ErrMissingRequiredField,
-		}
+		return errors.Required("", r.field.Name())
 	}
 	return nil
 }
