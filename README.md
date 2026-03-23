@@ -374,6 +374,62 @@ If you do not want confire to perform any validation at all, use the `NoValidate
 confire.Process(&conf, confire.NoValidate)
 ```
 
+### Validation Errors
+
+If you write your own config that implements the `Validator` interface, then you can use Confire's built in `InvalidConfig` errors as follows:
+
+```go
+import "go.rtnl.ai/confire"
+
+type MyConfig struct {
+	Interval time.Duration
+	Port     int
+	Window   TimeWindow
+}
+
+type TimeWindow struct {
+	Date   TimeDecoder
+    Length time.Duration
+}
+
+type TimeDecoder time.Time
+
+func (c MyConfig) Validate() (err error) {
+	if t.Interval < 1 {
+		// A more extensive required check that also takes into account negative values
+		err = confire.Join(err, confire.Required("", "interval"))
+	}
+
+	if t.Port < 2000 || t.Port > 65334 {
+		// A type specific invalid configuration error
+		err = confire.Join(err, confire.Invalid("", "port", "port must be in the integer range [2000, 65334]"))
+	}
+
+	// Returns all configuration errors, not just a single configuration error.
+	return err
+}
+
+func (c TimeWindow) Validate() (err error) {
+	if verr := CheckWindowLength(c.Length); verr != nil {
+		// Wrap another error as the invalid configuration error
+		// Note that you can use nesting to show that this is window.length that is erroring.
+		err = confire.Join(err, confire.Wrap("window", "length", "bad window length", verr))
+	}
+
+	return err
+}
+
+func (t *TimeDecoder) Decode(s string) error {
+	if e := time.Parse(s, layout); e != nil {
+		// Return a special parsing error error
+		return confire.Parse("", "date", e)
+	}
+	return nil
+}
+```
+
+This error handling allows you greater flexibility in returning invalid config typed errors that are the same types as the validator built in to confire. It also allows you to report all invalid fields all at once rather than one error at a time, using the `Join` functionality.
+
 ## Parsing
 
 Environment variables and default values in struct tags are all strings that must be parsed into more complex types such as `bool`, `uint64`, `[]string`, `map[int]string` and others, therefore some parsing is required.

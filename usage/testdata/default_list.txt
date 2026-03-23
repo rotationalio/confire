@@ -51,6 +51,11 @@ CONFIRE_TIMEOUT
 ··[type]········Duration
 ··[default]·····30s
 ··[required]····
+DATABASE_URL
+··[description]·database·connection·DSN
+··[type]········String
+··[default]·····
+··[required]····true
 CONFIRE_COLORS_PRIMARY
 ··[description]·
 ··[type]········String
@@ -61,7 +66,7 @@ CONFIRE_COLORS_SECONDARY
 ··[type]········String
 ··[default]·····#eeffee
 ··[required]····
-CONFIRE_SENDGRID_API_KEY
+SENDGRID_API_KEY
 ··[description]·
 ··[type]········String
 ··[default]·····

@@ -106,7 +106,10 @@ type Specification struct {
 	Cancel   uint16        `default:"16"`
 	LogLevel LogLevel      `default:"info" split_words:"true"`
 	Timeout  time.Duration `default:"30s" desc:"amount of time to wait for a respone"`
-	Colors   struct {
+	Database struct {
+		URL string `required:"true" env:"DATABASE_URL" desc:"database connection DSN"`
+	}
+	Colors struct {
 		Primary   Color `default:"#cc6699"`
 		Secondary Color `default:"#eeffee"`
 	}
@@ -183,6 +186,7 @@ func (e *CustomURL) Decode(value string) (err error) {
 }
 
 func compareUsage(t *testing.T, path, actual string) {
+	t.Helper()
 	data, err := os.ReadFile(path)
 	assert.Ok(t, err)
 	expected := string(data)
