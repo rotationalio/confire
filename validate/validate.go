@@ -37,7 +37,11 @@ func Validate(spec interface{}) (err error) {
 	errs := make(errors.ValidationErrors, 0, len(infos))
 	for _, info := range infos {
 		if verr := info.Validate.Validate(); verr != nil {
-			errs = append(errs, asValidationError(verr, info.Field.Name()))
+			if info.Field != nil {
+				errs = append(errs, asValidationError(verr, info.Field.Name())...)
+			} else {
+				errs = append(errs, asValidationError(verr, "")...)
+			}
 		}
 	}
 
@@ -57,7 +61,15 @@ func Gather(spec interface{}) (infos []Info, err error) {
 		return nil, errors.ErrInvalidSpecification
 	}
 
+	// Create the infos to gather
 	infos = make([]Info, 0, s.NumField())
+
+	// If the spec implements the Validate method, add it to the infos
+	if validator, ok := ValidatorAs(s); ok && validator != nil {
+		infos = append(infos, Info{Validate: validator})
+	}
+
+	// Find validators for the fields
 	for _, field := range s.Fields() {
 		// If the field is unexported, skip the field
 		if !field.IsExported() {
@@ -147,6 +159,14 @@ func ValidatorFrom(field *structs.Field) (v Validator) {
 	return v
 }
 
+// Attempts to get a Validator variable from the specified struct.
+func ValidatorAs(s *structs.Struct) (Validator, bool) {
+	if s.Implements((*Validator)(nil)) {
+		return s.Interface().(Validator), true
+	}
+	return nil, false
+}
+
 func isTrue(s string) bool {
 	b, _ := strconv.ParseBool(s)
 	return b
@@ -160,10 +180,18 @@ func ignoreValidation(s string) bool {
 	return false
 }
 
-func asValidationError(err error, source string) *errors.InvalidConfig {
+func asValidationError(err error, source string) errors.ValidationErrors {
+	out := make(errors.ValidationErrors, 0, 1)
+
 	target := &errors.InvalidConfig{}
 	if goerrors.As(err, &target) {
-		return target
+		return append(out, target)
 	}
-	return errors.Wrap("", source, err.Error(), err)
+
+	if errs, ok := err.(errors.ValidationErrors); ok {
+		out = append(out, errs...)
+		return out
+	}
+
+	return append(out, errors.Wrap("", source, err.Error(), err))
 }

@@ -16,6 +16,7 @@ type required struct {
 
 func (r required) Validate() error {
 	if r.field.IsZero() {
+		// TODO: add parent to the error
 		return errors.Required("", r.field.Name())
 	}
 	return nil

@@ -79,6 +79,16 @@ func (s *Struct) Field(name string) (*Field, error) {
 	return &Field{field: field, value: s.value.FieldByName(name)}, nil
 }
 
+// Implements checks if the struct implements the specified interface.
+func (s *Struct) Implements(iface interface{}) bool {
+	return s.value.Type().Implements(reflect.TypeOf(iface).Elem())
+}
+
+// Interface returns the underlying interface value of the struct.
+func (s *Struct) Interface() interface{} {
+	return s.raw
+}
+
 // IsZero returns true if all fields on the struct are a zero-value for their type.
 // Primitive types such as string, bool, int have zero-values "", false, 0, etc.
 // Collection types are generally zero-valued if they are empty or nil. Nested structs
