@@ -119,9 +119,7 @@ type Color [3]uint8
 
 func (c *Color) Decode(value string) error {
 	value = strings.TrimSpace(strings.ToLower(value))
-	if strings.HasPrefix(value, "#") {
-		value = value[1:]
-	}
+	value = strings.TrimPrefix(value, "#")
 
 	if len(value) != 6 {
 		return confire.Invalid("", "color", "invalid color: %q", value)
