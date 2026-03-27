@@ -558,6 +558,39 @@ Obviously this example is missing a lot of detail, but you can refer to the code
 
 Coming soon!
 
+## Testing
+
+Confire ships with some testing helper functions so that you can test your configuration's specific configuration or loading functionality. To manage the environment for a test:
+
+```go
+env := contest.Env{
+	"MYAPP_DEBUG":   "true",
+	"MYAPP_PORT": 	 "8888",
+	"MYAPP_TIMEOUT": "5s",
+	"MYAPP_RATE":    "0.25",
+	"MYAPP_COLORS":  "red:1,green:2,blue:3",
+	"MYAPP_PEERS": 	 "alpha,bravo,charlie",
+}
+
+func TestMyConf(t *testing.T) {
+	// Will set the environment variables describe by env and clean them back up to the
+	// original state after the test is completed.
+	t.Cleanup(env.Set())
+}
+```
+
+You can also clear the environment of the specified environment variables to check validation rules or to specify a specific subset of keys:
+
+```go
+func TestConfValidation(t *testing.T) {
+	t.Cleanup(env.Clear())
+}
+
+func TestSubsetOfKeys(t *testing.T) {
+	t.Cleanup(env.Set("MYAPP_TIMEOUT", "MYAPP_RATE", "MYAPP_PEERS"))
+}
+```
+
 ## Credits
 
 Special thanks to the following libraries for providing inspiration and code snippets using their open sources licenses:

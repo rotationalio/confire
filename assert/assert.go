@@ -10,6 +10,7 @@ package assert
 
 import (
 	"errors"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -46,6 +47,15 @@ func Ok(tb testing.TB, err error) {
 	}
 }
 
+// NotOk fails the test if an err is nil.
+func NotOk(tb testing.TB, err error) {
+	tb.Helper()
+	if err == nil {
+		tb.Logf("\nexpected error to be non-nil")
+		tb.FailNow()
+	}
+}
+
 // Equals fails the test if exp (expected) is not equal to act (actual).
 func Equals(tb testing.TB, exp, act interface{}) {
 	tb.Helper()
@@ -59,4 +69,26 @@ func Equals(tb testing.TB, exp, act interface{}) {
 func ErrorIs(tb testing.TB, err, target error) {
 	tb.Helper()
 	Assert(tb, errors.Is(err, target), "expected target to be in error chain")
+}
+
+// EnvUnset asserts that the environment variable is not set.
+func EnvUnset(tb testing.TB, key string) {
+	tb.Helper()
+	_, ok := os.LookupEnv(key)
+	Assert(tb, !ok, "expected environment variable %s to be unset", key)
+}
+
+// EnvIsSet asserts that the environment variable is set.
+func EnvIsSet(tb testing.TB, key string) {
+	tb.Helper()
+	_, ok := os.LookupEnv(key)
+	Assert(tb, ok, "expected environment variable %s to be set", key)
+}
+
+// EnvEquals asserts that the environment variable is set and equals the expected value.
+func EnvEquals(tb testing.TB, key, exp string) {
+	tb.Helper()
+	act, isSet := os.LookupEnv(key)
+	Assert(tb, isSet, "expected environment variable %s to be set", key)
+	Assert(tb, reflect.DeepEqual(exp, act), "expected environment variable %s to be set as\n\n\t- exp: %#v\n\t- got: %#v\n", key, exp, act)
 }
